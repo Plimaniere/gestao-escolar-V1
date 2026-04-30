@@ -1,0 +1,178 @@
+Enum status_ferias_enum {
+  Agendado
+  Cancelado
+  Em_Andamento
+}
+
+Table tb_endereco {
+  pk_cep varchar(20) [pk, not null]
+  numero int [not null]
+  complemento varchar(100)
+}
+
+Table tb_telefone {
+  pk_id_telefone int [pk]
+  pais varchar(20) [not null]
+  ddd int [not null]
+  numero varchar(20) [not null]
+  tipo varchar(30)
+}
+
+Table tb_responsavel1 {
+  pk_cpf_responsavel varchar(11) [pk, unique, not null]
+  telefone varchar(20) [not null]
+  nome varchar(30) [not null]
+  sobrenome varchar(50) [not null]
+  sexo int [not null]
+  email varchar(255) [not null]
+  grau_parentesco varchar(50) [not null]
+}
+
+Table tb_responsavel2 {
+  pk_cpf_responsavel varchar(11) [pk, unique, not null]
+  telefone varchar(20) [not null]
+  nome varchar(30) [not null]
+  sobrenome varchar(50) [not null]
+  sexo int
+  email varchar(255) [not null]
+  grau_parentesco varchar(50) [not null]
+}
+
+Table tb_doencas {
+  doencas_cid varchar(20) [pk, not null]
+  nome_doenca varchar(255) [not null]
+  tipo_doenca varchar(100) [not null]
+  especialidade_doenca varchar(50) [not null]
+  vacinas varchar(255) [not null]
+}
+
+Table tb_aluno {
+  pk_id_aluno int [pk]
+  nome varchar(30) [not null]
+  sobrenome varchar(50) [not null]
+  data_nascimento date [not null]
+  raca int
+  peso varchar(20)
+  fk_doencas_cid varchar(20)
+  cid_deficiencia varchar(50)
+  id_endereco varchar(20) [not null]
+  fk_id_telefone int [not null]
+  fk_sexo int
+  fk_responsavel1 varchar(11) [not null]
+  fk_responsavel2 varchar(11)
+}
+
+Table tb_alunos_pcd {
+  fk_id_aluno int [pk, not null]
+  cid_deficiencia varchar(50) [not null]
+  esp_deficiencia varchar(100) [not null]
+  idade varchar(20) [not null]
+  id_endereco varchar(20) [not null]
+}
+
+Table tb_funcionarios {
+  pk_id_funcionario int [pk, not null]
+  pk_cpf_funcionario char(11) [unique, not null]
+  nome varchar(30) [not null]
+  sobrenome varchar(50) [not null]
+  data_nascimento date
+  email varchar(100) [not null]
+  id_endereco varchar(20) [not null]
+  fk_id_telefone int [not null]
+  sexo int
+}
+
+
+Table tb_turma {
+  pk_id_disciplina int [pk]
+  nome_disciplina varchar(100) [not null]
+  id_professor int [not null]
+  carga_horaria varchar(50) [not null]
+  cor_sala varchar(50) [not null]
+}
+
+Table tb_matricula {
+  pk_id_matricula int [pk]
+  fk_id_aluno int [not null]
+  fk_id_disciplina int [not null]
+  status varchar(20)
+  data_matricula date
+  turno varchar(10)
+  nota decimal(4,2)
+}
+
+Table tb_frequencia_alunos {
+  id_frequencia int [pk]
+  fk_id_aluno int [not null]
+  id_matricula int [not null]
+  id_disciplina int [not null]
+  presenca varchar(50) [not null]
+}
+
+Table tb_salarios {
+  id_salario int [pk]
+  fk_id_funcionario int [not null]
+  data_pagamento date [not null]
+  valor decimal(10,2) [not null]
+}
+
+
+Table tb_ferias_funcionarios {
+  id_ferias int [pk]
+  id_funcionario int [not null]
+  data_inicio date [not null]
+  data_fim date [not null]
+  data_retorno date [not null]
+  abono_ferias decimal(10,2) [not null]
+  status status_ferias_enum [not null]
+}
+
+Table tb_frequencia_funcionarios {
+  id_frequencia_funcionario int [pk]
+  cpf_funcionario char(11) [not null]
+  fk_id_funcionario int [not null]
+  cargo_funcionario int [not null]
+  turno_funcionario datetime [not null]
+  presenca varchar(100) [not null]
+}
+
+Table tb_atestados {
+  id_atestado int [pk]
+  fk_id_aluno int
+  fk_id_funcionario int
+  data_entrega datetime [not null]
+  data_inicio date [not null]
+  data_fim date [not null]
+  nome_medico varchar(100) [not null]
+  crm_medico varchar(30) [not null]
+}
+
+
+Ref: tb_endereco.pk_cep < tb_aluno.id_endereco
+Ref: tb_telefone.pk_id_telefone < tb_aluno.fk_id_telefone
+Ref: tb_responsavel1.pk_cpf_responsavel < tb_aluno.fk_responsavel1
+Ref: tb_responsavel2.pk_cpf_responsavel < tb_aluno.fk_responsavel2
+Ref: tb_doencas.doencas_cid < tb_aluno.fk_doencas_cid
+
+Ref: tb_aluno.pk_id_aluno - tb_alunos_pcd.fk_id_aluno
+Ref: tb_endereco.pk_cep < tb_alunos_pcd.id_endereco
+
+Ref: tb_endereco.pk_cep < tb_funcionarios.id_endereco
+Ref: tb_telefone.pk_id_telefone < tb_funcionarios.fk_id_telefone
+
+Ref: tb_funcionarios.pk_id_funcionario < tb_turma.id_professor
+
+Ref: tb_aluno.pk_id_aluno <> tb_matricula.fk_id_aluno
+Ref: tb_turma.pk_id_disciplina <> tb_matricula.fk_id_disciplina
+
+Ref: tb_aluno.pk_id_aluno < tb_frequencia_alunos.fk_id_aluno
+Ref: tb_matricula.pk_id_matricula < tb_frequencia_alunos.id_matricula
+Ref: tb_turma.pk_id_disciplina < tb_frequencia_alunos.id_disciplina
+
+Ref: tb_funcionarios.pk_id_funcionario <> tb_salarios.fk_id_funcionario
+Ref: tb_funcionarios.pk_id_funcionario <> tb_ferias_funcionarios.id_funcionario
+Ref: tb_funcionarios.pk_id_funcionario < tb_frequencia_funcionarios.fk_id_funcionario
+Ref: tb_funcionarios.pk_cpf_funcionario < tb_frequencia_funcionarios.cpf_funcionario
+
+Ref: tb_aluno.pk_id_aluno < tb_atestados.fk_id_aluno
+Ref: tb_funcionarios.pk_id_funcionario < tb_atestados.fk_id_funcionario

@@ -1,0 +1,204 @@
+Table Dim_Aluno {
+  sk_id_aluno int [pk, increment]
+  id_aluno_nk varchar(20)
+  nome varchar(150)
+  sexo char(1)
+  data_nascimento date
+  faixa_etaria varchar(20)
+  raca varchar(50)
+  pcd_flag boolean
+  tipo_deficiencia varchar(100)
+  bairro varchar(100)
+  cidade varchar(100)
+  status_matricula varchar(20)
+  dt_inicio_vigencia date
+  dt_fim_vigencia date
+  flag_ativo boolean
+}
+
+Table Dim_Responsavel {
+  sk_id_responsavel int [pk, increment]
+  cpf_responsavel_nk char(11)
+  nome_completo varchar(150)
+  sexo char(1)
+  email varchar(150)
+  telefone varchar(30)
+  grau_parentesco varchar(50)
+  tipo_responsavel varchar(20)
+  cidade varchar(100)
+  estado char(2)
+  dt_inicio_vigencia date
+  dt_fim_vigencia date
+  flag_ativo boolean
+}
+
+Table Dim_Tempo {
+  sk_id_tempo int [pk, increment]
+  data_completa date
+  dia int
+  dia_semana varchar(20)
+  semana_ano int
+  mes int
+  nome_mes varchar(20)
+  trimestre int
+  semestre int
+  ano int
+  feriado_flag boolean
+}
+
+Table Dim_Turma {
+  sk_id_turma int [pk, increment]
+  codigo_turma varchar(20)
+  serie varchar(20)
+  turno varchar(20)
+  sala varchar(20)
+  ano_letivo int
+  capacidade int
+}
+
+Table Dim_Disciplina {
+  sk_id_disciplina int [pk, increment]
+  codigo_disciplina varchar(20)
+  nome_disciplina varchar(150)
+  area_conhecimento varchar(100)
+  carga_horaria int
+}
+
+Table Dim_Funcionario {
+  sk_id_funcionario_analitico int [pk, increment]
+  id_funcionario_nk varchar(20)
+  nome_completo varchar(150)
+  cpf_completo char(11)
+  data_nascimento_ano int
+  genero varchar(10)
+  cargo varchar(100)
+  departamento varchar(100)
+  escolaridade varchar(100)
+  tipo_contrato varchar(50)
+  data_admissao date
+  cidade varchar(100)
+  estado char(2)
+  is_pcd boolean
+  tipo_deficiencia varchar(100)
+}
+
+Table Dim_Local {
+  sk_id_local int [pk, increment]
+  unidade varchar(100)
+  bloco varchar(50)
+  sala varchar(50)
+  andar varchar(20)
+  endereco varchar(150)
+  cidade varchar(100)
+}
+
+Table Fato_Desempenho {
+  id_fato int [pk, increment]
+  fk_id_aluno int
+  fk_id_turma int
+  fk_id_disciplina int
+  fk_id_funcionario int
+  fk_id_tempo int
+  nota decimal(5,2)
+  peso_avaliacao decimal(5,2)
+  faltou_prova_flag boolean
+}
+
+Table Fato_Frequencia_Aluno {
+  id_fato int [pk, increment]
+  fk_id_aluno int
+  fk_id_turma int
+  fk_id_tempo int
+  presente_flag int
+  atraso_minutos int
+}
+
+Table Fato_Frequencia_Funcionario {
+  id_fato int [pk, increment]
+  fk_id_funcionario int
+  fk_id_tempo int
+  fk_id_local int
+  presente_flag int
+  horas_trabalhadas decimal(5,2)
+  atestado_flag boolean
+}
+
+Table Fato_Financeiro_RH {
+  id_fato int [pk, increment]
+  fk_id_funcionario int
+  fk_id_tempo int
+  salario_base decimal(12,2)
+  hora_extra decimal(12,2)
+  desconto decimal(12,2)
+  beneficios decimal(12,2)
+  valor_liquido decimal(12,2)
+}
+
+Table Fato_Matricula {
+  id_fato int [pk, increment]
+  fk_id_aluno int
+  fk_id_turma int
+  fk_id_tempo int
+  fk_id_responsavel int
+  status_matricula varchar(20)
+  valor_mensalidade decimal(12,2)
+  bolsa_percentual decimal(5,2)
+}
+
+Table Fato_Ferias {
+  id_fato int [pk, increment]
+  fk_id_funcionario int
+  fk_id_tempo_inicio int
+  fk_id_tempo_fim int
+  fk_id_tempo_retorno int
+  dias_ferias int
+  abono_ferias decimal(12,2)
+  status_ferias varchar(30)
+}
+
+Table Fato_Atestados {
+  id_fato int [pk, increment]
+  fk_id_aluno int
+  fk_id_funcionario int
+  fk_id_tempo_entrega int
+  fk_id_tempo_inicio int
+  fk_id_tempo_fim int
+  dias_afastamento int
+  nome_medico varchar(150)
+  crm_medico varchar(30)
+}
+
+/* RELACIONAMENTOS */
+
+Ref: Fato_Desempenho.fk_id_aluno > Dim_Aluno.sk_id_aluno
+Ref: Fato_Desempenho.fk_id_turma > Dim_Turma.sk_id_turma
+Ref: Fato_Desempenho.fk_id_disciplina > Dim_Disciplina.sk_id_disciplina
+Ref: Fato_Desempenho.fk_id_funcionario > Dim_Funcionario.sk_id_funcionario_analitico
+Ref: Fato_Desempenho.fk_id_tempo > Dim_Tempo.sk_id_tempo
+
+Ref: Fato_Frequencia_Aluno.fk_id_aluno > Dim_Aluno.sk_id_aluno
+Ref: Fato_Frequencia_Aluno.fk_id_turma > Dim_Turma.sk_id_turma
+Ref: Fato_Frequencia_Aluno.fk_id_tempo > Dim_Tempo.sk_id_tempo
+
+Ref: Fato_Frequencia_Funcionario.fk_id_funcionario > Dim_Funcionario.sk_id_funcionario_analitico
+Ref: Fato_Frequencia_Funcionario.fk_id_tempo > Dim_Tempo.sk_id_tempo
+Ref: Fato_Frequencia_Funcionario.fk_id_local > Dim_Local.sk_id_local
+
+Ref: Fato_Financeiro_RH.fk_id_funcionario > Dim_Funcionario.sk_id_funcionario_analitico
+Ref: Fato_Financeiro_RH.fk_id_tempo > Dim_Tempo.sk_id_tempo
+
+Ref: Fato_Matricula.fk_id_aluno > Dim_Aluno.sk_id_aluno
+Ref: Fato_Matricula.fk_id_turma > Dim_Turma.sk_id_turma
+Ref: Fato_Matricula.fk_id_tempo > Dim_Tempo.sk_id_tempo
+Ref: Fato_Matricula.fk_id_responsavel > Dim_Responsavel.sk_id_responsavel
+
+Ref: Fato_Ferias.fk_id_funcionario > Dim_Funcionario.sk_id_funcionario_analitico
+Ref: Fato_Ferias.fk_id_tempo_inicio > Dim_Tempo.sk_id_tempo
+Ref: Fato_Ferias.fk_id_tempo_fim > Dim_Tempo.sk_id_tempo
+Ref: Fato_Ferias.fk_id_tempo_retorno > Dim_Tempo.sk_id_tempo
+
+Ref: Fato_Atestados.fk_id_aluno > Dim_Aluno.sk_id_aluno
+Ref: Fato_Atestados.fk_id_funcionario > Dim_Funcionario.sk_id_funcionario_analitico
+Ref: Fato_Atestados.fk_id_tempo_entrega > Dim_Tempo.sk_id_tempo
+Ref: Fato_Atestados.fk_id_tempo_inicio > Dim_Tempo.sk_id_tempo
+Ref: Fato_Atestados.fk_id_tempo_fim > Dim_Tempo.sk_id_tempo
